@@ -175,7 +175,7 @@ bool COMXVideo::PortSettingsChanged()
   if (m_settings_changed)
   {
     PortSettingsChangedLogger(-1);
-    SetVideoRect(m_src_rect, m_config.dst_rect);
+    SetVideoRect(m_config.src_rect, m_config.dst_rect);
     m_omx_decoder.EnablePort(m_omx_decoder.GetOutputPort(), true);
     return true;
   }
@@ -224,7 +224,7 @@ bool COMXVideo::PortSettingsChanged()
     return false;
   }
 
-  SetVideoRect(m_src_rect, m_config.dst_rect);
+  SetVideoRect(m_config.src_rect, m_config.dst_rect);
 
   if(m_config.hdmi_clock_sync)
   {
@@ -375,7 +375,6 @@ bool COMXVideo::Open(OMXClock *clock, const OMXVideoConfig &config)
   m_setStartTime = true;
 
   m_config = config;
-  m_src_rect.SetRect(0, 0, 0, 0);
 
   m_video_codec_name      = "";
   m_codingType            = OMX_VIDEO_CodingUnused;
