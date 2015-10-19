@@ -57,6 +57,7 @@ public:
   bool hdmi_clock_sync;
   bool allow_mvc;
   int alpha;
+  int aspectMode;
   int display;
   int layer;
   float queue_size;
@@ -73,6 +74,7 @@ public:
     hdmi_clock_sync = false;
     allow_mvc = false;
     alpha = 255;
+    aspectMode = 0;
     display = 0;
     layer = 0;
     queue_size = 10.0f;
@@ -93,6 +95,7 @@ public:
   bool NaluFormatStartCodes(enum AVCodecID codec, uint8_t *in_extradata, int in_extrasize);
   bool Open(OMXClock *clock, const OMXVideoConfig &config);
   bool PortSettingsChanged();
+  void PortSettingsChangedLogger(int interlaceEMode);
   void Close(void);
   unsigned int GetFreeSpace();
   unsigned int GetSize();

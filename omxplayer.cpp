@@ -563,6 +563,7 @@ int main(int argc, char *argv[])
   const int display_opt     = 0x20f;
   const int alpha_opt       = 0x210;
   const int advanced_opt    = 0x211;
+  const int aspect_mode_opt = 0x212;
   const int http_cookie_opt = 0x300;
   const int http_user_agent_opt = 0x301;
 
@@ -601,6 +602,7 @@ int main(int argc, char *argv[])
     { "subtitles",    required_argument,  NULL,          subtitles_opt },
     { "lines",        required_argument,  NULL,          lines_opt },
     { "win",          required_argument,  NULL,          pos_opt },
+    { "aspect-mode",  required_argument,  NULL,          aspect_mode_opt },
     { "audio_fifo",   required_argument,  NULL,          audio_fifo_opt },
     { "video_fifo",   required_argument,  NULL,          video_fifo_opt },
     { "audio_queue",  required_argument,  NULL,          audio_queue_opt },
@@ -774,6 +776,18 @@ int main(int argc, char *argv[])
       case pos_opt:
         sscanf(optarg, "%f %f %f %f", &m_config_video.dst_rect.x1, &m_config_video.dst_rect.y1, &m_config_video.dst_rect.x2, &m_config_video.dst_rect.y2) == 4 ||
         sscanf(optarg, "%f,%f,%f,%f", &m_config_video.dst_rect.x1, &m_config_video.dst_rect.y1, &m_config_video.dst_rect.x2, &m_config_video.dst_rect.y2);
+        break;
+      case aspect_mode_opt:
+        if (optarg) {
+          if (!strcasecmp(optarg, "letterbox"))
+            m_config_video.aspectMode = 1;
+          else if (!strcasecmp(optarg, "fill"))
+            m_config_video.aspectMode = 2;
+          else if (!strcasecmp(optarg, "stretch"))
+            m_config_video.aspectMode = 3;
+          else
+            m_config_video.aspectMode = 0;
+        }
         break;
       case vol_opt:
 	m_Volume = atoi(optarg);
@@ -1424,6 +1438,19 @@ int main(int argc, char *argv[])
       case KeyConfig::ACTION_UNHIDE_VIDEO:
         // set alpha to maximum
         m_player_video.SetAlpha(255);
+        break;
+      case KeyConfig::ACTION_SET_ASPECT_MODE:
+        if (result.getWinArg()) {
+          if (!strcasecmp(result.getWinArg(), "letterbox"))
+            m_config_video.aspectMode = 1;
+          else if (!strcasecmp(result.getWinArg(), "fill"))
+            m_config_video.aspectMode = 2;
+          else if (!strcasecmp(result.getWinArg(), "stretch"))
+            m_config_video.aspectMode = 3;
+          else
+            m_config_video.aspectMode = 0;
+          m_player_video.SetVideoRect(SrcRect,m_config_video.dst_rect);
+        }
         break;
       case KeyConfig::ACTION_DECREASE_VOLUME:
         m_Volume -= 300;
