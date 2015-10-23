@@ -106,6 +106,8 @@ public:
   void SetDropState(bool bDrop);
   std::string GetDecoderName() { return m_video_codec_name; };
   void SetVideoRect(const CRect& SrcRect, const CRect& DestRect);
+  void SetVideoRect(int aspectMode);
+  void SetVideoRect();
   void SetAlpha(int alpha);
   int GetInputBufferSize();
   void SubmitEOS();

@@ -175,7 +175,7 @@ bool COMXVideo::PortSettingsChanged()
   if (m_settings_changed)
   {
     PortSettingsChangedLogger(port_image, -1);
-    SetVideoRect(m_config.src_rect, m_config.dst_rect);
+    SetVideoRect();
     m_omx_decoder.EnablePort(m_omx_decoder.GetOutputPort(), true);
     return true;
   }
@@ -224,7 +224,7 @@ bool COMXVideo::PortSettingsChanged()
     return false;
   }
 
-  SetVideoRect(m_config.src_rect, m_config.dst_rect);
+  SetVideoRect();
 
   if(m_config.hdmi_clock_sync)
   {
@@ -813,6 +813,19 @@ void COMXVideo::Reset(void)
 ///////////////////////////////////////////////////////////////////////////////////////////
 void COMXVideo::SetVideoRect(const CRect& SrcRect, const CRect& DestRect)
 {
+  m_config.src_rect = SrcRect;
+  m_config.dst_rect = DestRect;
+  SetVideoRect();
+}
+
+void COMXVideo::SetVideoRect(int aspectMode)
+{
+  m_config.aspectMode = aspectMode;
+  SetVideoRect();
+}
+
+void COMXVideo::SetVideoRect()
+{
   CSingleLock lock (m_critSection);
   if(!m_is_open)
     return;
@@ -826,12 +839,12 @@ void COMXVideo::SetVideoRect(const CRect& SrcRect, const CRect& DestRect)
   configDisplay.noaspect   = m_config.aspectMode == 3 ? OMX_TRUE : OMX_FALSE;
   configDisplay.mode       = m_config.aspectMode == 2 ? OMX_DISPLAY_MODE_FILL : OMX_DISPLAY_MODE_LETTERBOX;
 
-  configDisplay.src_rect.x_offset   = (int)(SrcRect.x1+0.5f);
-  configDisplay.src_rect.y_offset   = (int)(SrcRect.y1+0.5f);
-  configDisplay.src_rect.width      = (int)(SrcRect.Width()+0.5f);
-  configDisplay.src_rect.height     = (int)(SrcRect.Height()+0.5f);
+  configDisplay.src_rect.x_offset   = (int)(m_config.src_rect.x1+0.5f);
+  configDisplay.src_rect.y_offset   = (int)(m_config.src_rect.y1+0.5f);
+  configDisplay.src_rect.width      = (int)(m_config.src_rect.Width()+0.5f);
+  configDisplay.src_rect.height     = (int)(m_config.src_rect.Height()+0.5f);
 
-  if (DestRect.x2 > DestRect.x1 && DestRect.y2 > DestRect.y1) {
+  if (m_config.dst_rect.x2 > m_config.dst_rect.x1 && m_config.dst_rect.y2 > m_config.dst_rect.y1) {
     configDisplay.set        = (OMX_DISPLAYSETTYPE)(configDisplay.set | OMX_DISPLAY_SET_DEST_RECT);
     configDisplay.fullscreen = OMX_FALSE;
 
@@ -839,10 +852,10 @@ void COMXVideo::SetVideoRect(const CRect& SrcRect, const CRect& DestRect)
       configDisplay.noaspect = OMX_TRUE;
     }
 
-    configDisplay.dest_rect.x_offset  = (int)(DestRect.x1+0.5f);
-    configDisplay.dest_rect.y_offset  = (int)(DestRect.y1+0.5f);
-    configDisplay.dest_rect.width     = (int)(DestRect.Width()+0.5f);
-    configDisplay.dest_rect.height    = (int)(DestRect.Height()+0.5f);
+    configDisplay.dest_rect.x_offset  = (int)(m_config.dst_rect.x1+0.5f);
+    configDisplay.dest_rect.y_offset  = (int)(m_config.dst_rect.y1+0.5f);
+    configDisplay.dest_rect.width     = (int)(m_config.dst_rect.Width()+0.5f);
+    configDisplay.dest_rect.height    = (int)(m_config.dst_rect.Height()+0.5f);
   } else {
     configDisplay.fullscreen = OMX_TRUE;
   }

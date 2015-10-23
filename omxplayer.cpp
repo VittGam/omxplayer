@@ -1458,7 +1458,7 @@ int main(int argc, char *argv[])
             m_config_video.aspectMode = 3;
           else
             m_config_video.aspectMode = 0;
-          m_player_video.SetVideoRect(m_config_video.src_rect, m_config_video.dst_rect);
+          m_player_video.SetVideoRect(m_config_video.aspectMode);
         }
         break;
       case KeyConfig::ACTION_DECREASE_VOLUME:
