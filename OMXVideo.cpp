@@ -125,7 +125,7 @@ bool COMXVideo::NaluFormatStartCodes(enum AVCodecID codec, uint8_t *in_extradata
   return false;    
 }
 
-void COMXVideo::PortSettingsChangedLogger(int interlaceEMode)
+void COMXVideo::PortSettingsChangedLogger(OMX_PARAM_PORTDEFINITIONTYPE port_image, int interlaceEMode)
 {
   CLog::Log(LOGDEBUG, "%s::%s - %dx%d@%.2f interlace:%d deinterlace:%d anaglyph:%d par:%.2f display:%d layer:%d alpha:%d aspectMode:%d", CLASSNAME, __func__,
       port_image.format.video.nFrameWidth, port_image.format.video.nFrameHeight,
@@ -174,7 +174,7 @@ bool COMXVideo::PortSettingsChanged()
 
   if (m_settings_changed)
   {
-    PortSettingsChangedLogger(-1);
+    PortSettingsChangedLogger(port_image, -1);
     SetVideoRect(m_config.src_rect, m_config.dst_rect);
     m_omx_decoder.EnablePort(m_omx_decoder.GetOutputPort(), true);
     return true;
@@ -197,7 +197,7 @@ bool COMXVideo::PortSettingsChanged()
 
   m_omx_render.ResetEos();
 
-  PortSettingsChangedLogger(interlace.eMode);
+  PortSettingsChangedLogger(port_image, interlace.eMode);
 
   if(!m_omx_sched.Initialize("OMX.broadcom.video_scheduler", OMX_IndexParamVideoInit))
     return false;
@@ -741,7 +741,6 @@ int COMXVideo::Decode(uint8_t *pData, int iSize, double dts, double pts)
     else if (pts == DVD_NOPTS_VALUE)
       nFlags |= OMX_BUFFERFLAG_TIME_IS_DTS;
 
-    int loop = 0;
     while(demuxer_bytes)
     {
       // 500ms timeout
@@ -833,7 +832,7 @@ void COMXVideo::SetVideoRect(const CRect& SrcRect, const CRect& DestRect)
   configDisplay.src_rect.height     = (int)(SrcRect.Height()+0.5f);
 
   if (DestRect.x2 > DestRect.x1 && DestRect.y2 > DestRect.y1) {
-    configDisplay.set        |= OMX_DISPLAY_SET_DEST_RECT;
+    configDisplay.set        = (OMX_DISPLAYSETTYPE)(configDisplay.set | OMX_DISPLAY_SET_DEST_RECT);
     configDisplay.fullscreen = OMX_FALSE;
 
     if (m_config.aspectMode != 1 && m_config.aspectMode != 2 && m_config.aspectMode != 3) {

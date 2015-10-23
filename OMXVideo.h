@@ -97,7 +97,7 @@ public:
   bool NaluFormatStartCodes(enum AVCodecID codec, uint8_t *in_extradata, int in_extrasize);
   bool Open(OMXClock *clock, const OMXVideoConfig &config);
   bool PortSettingsChanged();
-  void PortSettingsChangedLogger(int interlaceEMode);
+  void PortSettingsChangedLogger(OMX_PARAM_PORTDEFINITIONTYPE port_image, int interlaceEMode);
   void Close(void);
   unsigned int GetFreeSpace();
   unsigned int GetSize();
